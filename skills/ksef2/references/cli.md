@@ -1,7 +1,7 @@
 # ksef2-cli reference
 
-Verified against `ksef2-cli 1.0.0` / `ksef2 1.1.0` at the commit pinned in
-[../provenance.md](../provenance.md). The full option table is generated
+Written for `ksef2-cli 1.0.0` / `ksef2 1.1.0`
+([../provenance.md](../provenance.md)). The full option table is generated
 upstream in `docs/reference/commands.md`; this file carries the shape,
 guarantees, and worked examples. For any flag not shown here, run
 `ksef2 <group> <subcommand> --help` — that output is authoritative and works
@@ -276,8 +276,3 @@ need:
 ```bash
 python3 -c 'import json; from ksef2.fa3 import KsefInvoiceDraft; print(json.dumps(KsefInvoiceDraft.model_json_schema()))' > draft-schema.json
 ```
-
-## Verifying commands
-
-- `ksef2 <group> <subcommand> --help` lists every option with type, default,
-  and env var — offline and authoritative.

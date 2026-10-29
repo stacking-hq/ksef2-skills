@@ -18,15 +18,15 @@ and no network access. Its content is pinned to upstream commits in
 ## Layout
 
 ```text
-skills/ksef2/
+skills/ksef2/                The installed skill
 ├── SKILL.md                 Entrypoint: operating rules + routing
 ├── references/
-│   ├── cli.md               ksef2-cli commands, output, pagination, async
+│   ├── cli.md               ksef2-cli commands, output, FA(3) drafts, async
 │   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
 │   ├── auth-security.md     credentials, secrets, profiles, environments
 │   └── bot-integration.md   assistant/bot integration
-├── evals/prompts.md         11 eval prompts with pass/fail criteria
 └── provenance.md            pinned source SHAs, offline checks, limitations
+evals/prompts.md             For maintainers: 11 eval prompts, not installed
 ```
 
 ## Install
@@ -64,9 +64,10 @@ with `$ksef2`.
 
 ## Evaluate
 
-[`skills/ksef2/evals/prompts.md`](skills/ksef2/evals/prompts.md) contains 11
-realistic prompts with pass/fail criteria. Give an agent the skill plus one
-prompt in a scratch workspace; do not include the criteria in the prompt.
+[`evals/prompts.md`](evals/prompts.md) contains 11 realistic prompts with
+pass/fail criteria for checking the skill after a change. Give an agent the
+skill plus one prompt in a scratch workspace; do not include the criteria in
+the prompt.
 
 ## Publish
 

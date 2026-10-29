@@ -1,9 +1,6 @@
 # ksef2 SDK reference
 
-Verified against `ksef2 1.1.0` at the commit pinned in
-[../provenance.md](../provenance.md). Public-API contract and exception
-hierarchy come from the pinned source docs; the checks marked *verified* were
-executed offline (no KSeF credentials, no network).
+Written for `ksef2 1.1.0` ([../provenance.md](../provenance.md)).
 
 ## Install
 
@@ -18,7 +15,7 @@ Python 3.12+. Extras: `ksef2[pdf]` (local invoice PDF rendering),
 
 ## Stable import paths
 
-These are the paths intended to survive the 1.x line (verified importable):
+These are the paths intended to survive the 1.x line:
 
 | Import | Use for |
 | --- | --- |
@@ -55,7 +52,7 @@ with Client(Environment.TEST) as client:      # construction is local; no reques
     ...
 ```
 
-| Environment | Base URL *(verified)* | Role |
+| Environment | Base URL | Role |
 | --- | --- | --- |
 | `Environment.TEST` | `https://api-test.ksef.mf.gov.pl/v2` | Development, TEST-only helpers, real work only with test data. |
 | `Environment.DEMO` | `https://api-demo.ksef.mf.gov.pl/v2` | Production-like behavior, non-production credentials. |
@@ -64,7 +61,7 @@ with Client(Environment.TEST) as client:      # construction is local; no reques
 `AsyncClient` mirrors `Client` with `await`. `with_profile()` rejects a
 profile whose environment does not match the client's, and TEST-only helpers
 enforce themselves — `with_test_certificate()` outside `Environment.TEST`
-raises `KSeFUnsupportedEnvironmentError` before any request *(verified)*.
+raises `KSeFUnsupportedEnvironmentError` before any request.
 
 ## Authentication → AuthenticatedClient
 
@@ -84,12 +81,11 @@ after a `401`, concurrent requests share one refresh
 (`TransportConfig(auto_refresh_tokens=True)` is the default). A dead refresh
 token raises `KSeFAuthenticationExpiredError` — authenticate again. Rejected
 inputs fail locally: an invalid NIP checksum raises `KSeFArgumentError` with
-a `hint` before any request *(verified)*.
+a `hint` before any request.
 
-## Offline-verified snippet
+## Build an invoice locally
 
-Local FA(3) building plus client construction — runs with no credentials
-(executed at the pinned version):
+Local FA(3) building plus client construction — runs with no credentials:
 
 ```python
 from datetime import date, datetime, timezone
@@ -136,7 +132,7 @@ with Client(Environment.TEST) as client:
     processed = auth.invoices.download(status.ksef_number, timeout=120.0)
 ```
 
-Handles and their waits *(names verified on the installed classes)*:
+Handles and their waits:
 
 | Handle | Wait for | Later reads |
 | --- | --- | --- |
@@ -177,15 +173,15 @@ for page in pager.responses():           # typed pages; .pages(), .first_respons
 ```
 
 - `auth.invoices.search(...)` returns `InvoiceSearchPager` with `responses()`,
-  `pages()`, `page(cursor)`, `first_page()`, `first_response()`, `wait()`
-  *(methods verified)*. Generic `Pager` (tokens, certificates, permissions,
+  `pages()`, `page(cursor)`, `first_page()`, `first_response()`, `wait()`.
+  Generic `Pager` (tokens, certificates, permissions,
   sessions, …) exposes `pages()`, `page(cursor)`, `first_page()`, `wait()`.
 - `page(cursor)` returns `next_cursor` (`Page` fields: `items`,
-  `next_cursor` *(verified)*); store it to resume the same search in another
+  `next_cursor`); store it to resume the same search in another
   process. Only `next_cursor is None` ends the search — an empty page can
   still name the next one.
 - The filter's date span is validated client-side: over 100 days raises
-  `KSeFValidationError` before any request *(verified)*.
+  `KSeFValidationError` before any request.
 - Direct download: `auth.invoices.download(ksef_number, timeout=...)` polls
   until the document is available.
 - Export: `auth.invoices.export(filters)` → `ExportJob`; `.wait()` downloads,
@@ -205,8 +201,7 @@ final response is truncated.
 
 ## Retries and transport
 
-`TransportConfig(retry=RetryConfig(), timeouts=TimeoutConfig(), …)` — defaults
-*(verified against the installed classes)*:
+`TransportConfig(retry=RetryConfig(), timeouts=TimeoutConfig(), …)` — defaults:
 
 | `RetryConfig` | Default |
 | --- | --- |
@@ -273,9 +268,3 @@ reaches the caller.
 Silent by default, structured through the standard `ksef2` logger; opt in with
 `configure_logging(level="INFO", renderer="console")`. Tokens, keys, and
 presigned URLs are excluded from log events.
-
-## Verifying SDK claims
-
-Compare imports, attributes, and defaults with the pinned upstream SDK source.
-See [../provenance.md](../provenance.md) for the recorded offline checks and
-their limitations.

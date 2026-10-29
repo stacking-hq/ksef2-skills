@@ -1,14 +1,11 @@
 # Authentication and security
 
 Single source for credentials, secret storage, and environments.
-Verified against the pinned commits in
-[../provenance.md](../provenance.md); the exit-code and exception checks below
-were executed offline.
 
 ## Choose one method
 
 Exactly one authentication method per command — two methods fail before any
-request *(recorded)*:
+request:
 
 ```bash
 ksef2 --env test --nip 5261040828 --test-cert --token <value> --json auth login
@@ -26,7 +23,7 @@ ksef2 --env test --nip 5261040828 --test-cert --token <value> --json auth login
 Most methods also need the context NIP (`--nip` / `KSEF2_NIP`).
 
 TEST certificate material is TEST-only. Both layers enforce it before any
-request is sent *(recorded)*:
+request is sent:
 
 ```bash
 ksef2 --env production --nip 5261040828 --test-cert --json auth login

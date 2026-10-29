@@ -1,8 +1,7 @@
 # Provenance
 
 Everything in this skill was distilled from the two upstream repositories at
-the commits below, then checked with the recorded runs. `scripts/verify.py`
-parses the `sha=` lines to confirm a source checkout still matches.
+the commits below, then checked with the recorded runs.
 
 ## Pinned sources
 
@@ -18,7 +17,6 @@ Re-verify after moving a pin:
 
 ```bash
 git -C <checkout> rev-parse HEAD     # must equal the sha= line above
-python skills/ksef2/scripts/verify.py --source <ksef2-cli checkout> --source-sdk <ksef2 checkout>
 ```
 
 ## Recorded checks (2026-10-29, macOS, CPython 3.12.11, temporary venv)
@@ -51,7 +49,7 @@ Re-executed after the last content edits, with the two checkouts above:
 
 | Check | Actual result |
 | --- | --- |
-| `python skills/ksef2/scripts/verify.py --source /tmp/ksef2-src/ksef2-cli --source-sdk /tmp/ksef2-src/ksef2 --python <venv>/bin/python` | 99 checks, all PASS, exit 0 |
+| Historical offline verification, before the verification script was removed | 99 checks, all PASS, exit 0 |
 | `npx skills list --json` in this repo | one skill discovered: `name=ksef2`, path `skills/ksef2` |
 | `ksef2 --help` | 16 command groups |
 | `ksef2 definitely-not-a-command` | exit 2 |
@@ -79,9 +77,9 @@ runtime semantics.
 - **PyPI wheels.** Installed versions match the pinned version numbers; the
   wheel build attestation chain was not independently checked.
 - **Renderer effects.** Rich help tables wrap or truncate on narrow
-  terminals; `verify.py` sets `COLUMNS=240`, but a differing terminal or
+  terminals; the recorded checks used `COLUMNS=240`, but a differing terminal or
   Typer/Rich version can still change rendering and produce false negatives.
 - **Presence ≠ semantics.** Attribute and field checks prove a name exists,
   not that its runtime behavior matches the prose.
 - **Pins age.** The commits are dated 2026-10-28; upstream moves on. Update
-  the `sha=` lines and re-run `verify.py` when refreshing the skill.
+  the `sha=` lines and repeat the CLI and SDK checks when refreshing the skill.

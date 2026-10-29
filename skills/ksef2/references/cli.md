@@ -237,6 +237,3 @@ ksef2 fa3 render --in invoice.xml --out invoice.html
 
 - `ksef2 <group> <subcommand> --help` lists every option with type, default,
   and env var — offline and authoritative.
-- `python scripts/verify.py` (from the skill root) checks every command and
-  flag documented in this file against the installed CLI and/or a pinned
-  source checkout. It never talks to KSeF.

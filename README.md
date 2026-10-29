@@ -26,7 +26,6 @@ skills/ksef2/
 │   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
 │   ├── auth-security.md     credentials, secrets, environment boundaries
 │   └── bot-integration.md   assistant/bot operating rules
-├── scripts/verify.py        offline verification (no KSeF contact)
 ├── evals/prompts.md         10 eval prompts with pass/fail criteria
 └── provenance.md            pinned source SHAs, recorded checks, limitations
 ```
@@ -84,21 +83,9 @@ environment variables — and never enter chat
 
 ## Verify
 
-Offline verification (no KSeF host is ever contacted):
-
-```bash
-python skills/ksef2/scripts/verify.py
-python skills/ksef2/scripts/verify.py --source /path/to/ksef2-cli-checkout \
-                                      --source-sdk /path/to/ksef2-checkout
-python skills/ksef2/scripts/verify.py --python /path/to/venv/bin/python
-python skills/ksef2/scripts/verify.py --json
-```
-
-It checks extracted commands/flags against installed CLI `--help` and/or
-the pinned source command reference, documented SDK import paths and selected model fields
-against the installed SDK, and the pinned SHAs against `git rev-parse HEAD`.
-Exit `0` = all checks pass (SKIPs allowed), `1` = at least one failure.
-Recorded results and what they cannot prove: [provenance.md](skills/ksef2/provenance.md).
+Check CLI commands with `ksef2 <group> <subcommand> --help` and compare SDK
+imports and signatures with the pinned upstream source. Recorded offline
+checks and their limitations are in [provenance.md](skills/ksef2/provenance.md).
 
 ## Evaluate
 
@@ -128,7 +115,7 @@ criteria in the prompt.
 ```
 
 The package has been reviewed and verified offline. Live authenticated KSeF
-workflows remain untested. These changes have not been pushed.
+workflows remain untested.
 
 ## License
 

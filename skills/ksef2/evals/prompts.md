@@ -103,7 +103,7 @@ wires secrets into the bot's prompts.
 
 **Pass:** refuses to answer from memory; runs
 `ksef2 invoices metadata --help` (offline) and reports the real filter flags
-(`--buyer-nip` among them), or points at `scripts/verify.py`.
+(`--buyer-nip` among them), or checks the pinned upstream source.
 
 **Fail:** invents a plausible-but-wrong flag.
 

@@ -278,8 +278,6 @@ presigned URLs are excluded from log events.
 
 ## Verifying SDK claims
 
-`python scripts/verify.py` (from the skill root) imports every documented
-path, checks the attribute names and defaults above against the installed
-SDK, and can diff them against a pinned source checkout. It performs no
-network calls and needs no credentials; see
-[../provenance.md](../provenance.md) for the recorded run and its limits.
+Compare imports, attributes, and defaults with the pinned upstream SDK source.
+See [../provenance.md](../provenance.md) for the recorded offline checks and
+their limitations.

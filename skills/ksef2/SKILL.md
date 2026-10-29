@@ -49,9 +49,7 @@ Flags and model fields drift between releases. Before quoting a command or
 field you have not seen in a reference here, confirm it:
 
 - CLI: `ksef2 <group> <subcommand> --help` — offline, needs no credentials.
-- Whole skill: `python scripts/verify.py` re-checks extracted commands,
-  flags, import paths, and selected SDK contracts in this skill against the installed packages, or
-  against a pinned source checkout with `--source` / `--source-sdk`.
+- SDK: compare imports, signatures, and models with the pinned upstream source.
 
 [provenance.md](provenance.md) records what was verified at the pinned
 commits, and what offline verification cannot cover.

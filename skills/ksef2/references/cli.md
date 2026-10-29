@@ -71,11 +71,15 @@ ksef2 config show
 ## Read-only queries
 
 ```bash
-# Invoice metadata; --date-from is required, max range 100 days
+# Sales invoices; --date-from is required, --date-to defaults to now
 ksef2 --profile test-company --json invoices metadata \
   --role seller \
-  --date-from 2026-10-01T00:00:00Z \
+  --date-from 2026-10-01T00:00:00Z --date-to 2026-10-31T23:59:59Z \
   --all
+
+# Purchase invoices: the profile's NIP as buyer
+ksef2 --profile test-company --json invoices metadata \
+  --role buyer --date-from 2026-10-26 --all
 
 # Same query with direct options instead of a profile (e.g. in CI)
 ksef2 --env test --nip "$KSEF2_NIP" --token "$KSEF2_TOKEN" --json \
@@ -95,6 +99,10 @@ ksef2 encryption certificates
 ksef2 limits get api
 ```
 
+The range from `--date-from` to `--date-to` may not exceed 100 days, so set
+`--date-to` whenever the start lies far back. Dates without an offset are read
+in Europe/Warsaw time.
+
 Group map: `auth` `batch` `certificates` `collective` `config` `encryption`
 `fa3` `invoices` `limits` `online` `peppol` `permissions` `profile` `sessions`
 `testdata` `tokens`. `testdata` is TEST-only fixtures (subjects, persons,
@@ -108,12 +116,15 @@ empty — check the exit code before parsing stdout. In JSON mode an error is
 one object:
 
 ```json
-{"error": {"type": "RemoteServiceError", "title": "KSeF rejected the request", "message": "...", "details": [], "hints": [], "exit_code": 1, "ksef": {"status_code": 400, "ksef_code": 21405, "trace_id": "..."}}}
+{"error": {"code": "...", "ksef_code": 21405, "trace_id": "...", "type": "RemoteServiceError", "title": "KSeF rejected the request", "message": "...", "details": [], "hints": [], "exit_code": 1, "ksef": {"status_code": 400, "exception_code": "...", "message": "..."}}}
 ```
 
-`details`, `hints`, and `exit_code` are always present; `ksef` appears when
-KSeF answered (`status_code`, `ksef_code`, `trace_id` — quote the trace ID in
-incident reports). Secrets recognized on the command line or in secret env
+`code`, `ksef_code`, `trace_id`, `type`, `title`, `message`, `details`,
+`hints`, and `exit_code` are always present (`ksef_code` and `trace_id` may be
+`null`); `ksef` appears when KSeF answered. Quote `trace_id` in incident
+reports. As an agent, add `--json` to every command, and on an error read
+`message` and `hints` before retrying: exit `2` means the command line itself
+was wrong. Secrets recognized on the command line or in secret env
 vars are replaced with `<redacted>` before the payload is encoded.
 
 | Exit code | Meaning |
@@ -221,16 +232,49 @@ the saved receipt or ask `invoices status --receipt …`, `online list`, or
 does not unsubmit it. State and receipt files carry session AES keys in plain
 text — treat them as credentials ([auth-security.md](auth-security.md)).
 
-## Local-only commands
+## Build an FA(3) invoice
 
-`fa3` builds and inspects invoices with no KSeF access and no credentials —
-runnable end to end offline (recorded in ../provenance.md):
+`fa3` runs locally, with no KSeF access and no credentials. You write a JSON
+draft; `fa3 build` computes the amounts and the VAT summary, then checks the
+XML against the FA(3) schema:
 
 ```bash
-ksef2 fa3 draft-example --out draft.json
-ksef2 fa3 build --in draft.json --out invoice.xml
-ksef2 fa3 inspect invoice.xml
+ksef2 fa3 draft-example --out draft.json      # template to edit
+ksef2 --json fa3 build --in draft.json --out invoice.xml
+ksef2 --json fa3 inspect invoice.xml          # what the XML actually says
 ksef2 fa3 render --in invoice.xml --out invoice.html
+```
+
+The template holds sample data. Before sending, replace:
+
+- `seller.tax_id` with the NIP of the sending profile
+  (`ksef2 profile show NAME`) — KSeF rejects another seller NIP with a
+  permission error;
+- `body.issue_date` (fixed at `2026-04-09`), `body.invoice_number`, and the
+  rows.
+
+A row carries `name`, `quantity`, `unit_of_measure`, `unit_price_net`, and
+`vat_rate`. Write numbers as strings (`"10"`, `"100.00"`); `vat_rate` must be
+a string from `23 22 8 7 5 4 3 0 zw np oo` — a JSON number crashes the build.
+Write no totals.
+
+A correction sets `body.invoice_type` to the full label
+`"Faktura korygująca"` (the short code `KOR` is rejected) and lists the
+corrected invoice under `body.correction.corrected_invoices`
+(`issue_date`, `invoice_number`, `ksef_id`). Rows with
+`"before_correction": true` give the state before the correction.
+
+**Check `fa3 inspect` before sending.** Unknown keys inside `seller`, `buyer`,
+`body`, and rows are dropped without an error: a row with `"qty"` instead of
+`"quantity"` builds a schema-valid invoice for 0.00 and exits `0`. Compare
+parties, rows, and totals in the inspect output with the request.
+
+For fields beyond the template (advances, payment, foreign currency), read
+the draft's JSON Schema from the SDK and look up only the definitions you
+need:
+
+```bash
+python3 -c 'import json; from ksef2.fa3 import KsefInvoiceDraft; print(json.dumps(KsefInvoiceDraft.model_json_schema()))' > draft-schema.json
 ```
 
 ## Verifying commands

@@ -133,3 +133,18 @@ mentions `fa3 inspect`/`fa3 render` for checking the result.
 
 **Fail:** attempts authentication first; claims a KSeF account is required
 for XML generation.
+
+## Eval 11 — Invoice from a description
+
+**Prompt:** "Issue an invoice to NIP 9876543210 for 1000 PLN net for
+consulting services." (A profile is configured.)
+
+**Pass:** starts from `fa3 draft-example`; sets the seller NIP from the
+profile, today's issue date, a new invoice number, and one row with
+`quantity`, `unit_price_net`, and a string `vat_rate`; writes no totals;
+builds, then shows the `fa3 inspect` preview with environment and NIP, and
+sends only after the user confirms; reports the KSeF number and UPO.
+
+**Fail:** sends the template's sample seller NIP, date, or number; computes
+totals by hand; sends without showing the preview; trusts a successful
+`fa3 build` without reading `fa3 inspect`.

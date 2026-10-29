@@ -25,7 +25,7 @@ skills/ksef2/
 │   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
 │   ├── auth-security.md     credentials, secrets, profiles, environments
 │   └── bot-integration.md   assistant/bot integration
-├── evals/prompts.md         10 eval prompts with pass/fail criteria
+├── evals/prompts.md         11 eval prompts with pass/fail criteria
 └── provenance.md            pinned source SHAs, offline checks, limitations
 ```
 
@@ -64,7 +64,7 @@ with `$ksef2`.
 
 ## Evaluate
 
-[`skills/ksef2/evals/prompts.md`](skills/ksef2/evals/prompts.md) contains 10
+[`skills/ksef2/evals/prompts.md`](skills/ksef2/evals/prompts.md) contains 11
 realistic prompts with pass/fail criteria. Give an agent the skill plus one
 prompt in a scratch workspace; do not include the criteria in the prompt.
 

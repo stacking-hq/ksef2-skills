@@ -90,7 +90,9 @@ backups, Docker layers, or a commit.
 | `batch prepare --out` | Session key beside the encrypted invoice payloads. |
 | `batch submit --state-file` | Session key and prepared-package digest. |
 
-Keep them outside the repository, listed in `.gitignore`, in a private
+Write them only when a later command needs them — a single command
+authenticates on its own, so `auth login --save-state` is rarely needed. Keep
+them outside the repository, listed in `.gitignore`, in a private
 directory such as `$XDG_RUNTIME_DIR` on a shared machine, and delete them when
 the workflow ends (`ksef2 --auth-state ksef2-auth.json --json auth logout`
 removes the state file once KSeF confirms the session ended).
@@ -101,7 +103,7 @@ removes the state file once KSeF confirms the session ended).
 suffix of each token beside its expiry — a log or pasted comment keeps
 nothing reusable. `--show-tokens` prints the raw bearer tokens instead; a
 command that also uses `--save-state` stays masked even under `--show-tokens`.
-In `--json` mode, every recognized secret is replaced with `<redacted>`
+Agents never pass `--show-tokens`. In `--json` mode, every recognized secret is replaced with `<redacted>`
 before encoding. When a later command needs the credential, save it to a file
 rather than capturing output.
 

@@ -21,13 +21,17 @@ These apply on every path below.
   silently targets TEST. Ask only when the target is unclear — no profile,
   several candidates, or a request that does not fit the configured
   environment. TEST is for experiments and test data.
-- **Know whose name you act in.** Before sending invoices or changing
-  permissions, tokens, or certificates, check the environment and context NIP
-  behind the profile (`ksef2 profile show NAME`) and name them to the user.
+- **Know whose name you act in.** Check the environment and context NIP
+  behind the profile (`ksef2 profile show NAME`). Name them to the user when
+  you start working with a profile, and again before sending invoices or
+  changing permissions, tokens, or certificates.
 - **Read-only first.** Answer data questions with query commands
   (`invoices metadata`, `sessions invoice-list`, `tokens list`, …). Commands
   that change state run only when the user asked for that action. A request
   made earlier in the task still counts — do not ask for it again.
+- **Preview invoices you drafted.** When you wrote the invoice content
+  yourself, show the `fa3 inspect` preview and send only after the user
+  confirms it. An invoice file the user supplied needs no extra confirmation.
 - **Credentials stay local.** Chat, displayed commands, and logs carry profile
   names, environment-variable names, and file paths — never token values,
   certificate material, passwords, or session keys. Receipts, state files,
@@ -43,6 +47,7 @@ Read only the reference the current task needs.
 | Task | Read |
 | --- | --- |
 | Run commands, read output and exit codes, paginate, drive `--wait` workflows | [references/cli.md](references/cli.md) |
+| Build an FA(3) invoice from a request, or a correction | [references/cli.md](references/cli.md#build-an-fa3-invoice) |
 | Write Python against the SDK: clients, models, async handles, retries, errors | [references/sdk-api.md](references/sdk-api.md) |
 | Authenticate, store secrets, configure profiles and environments | [references/auth-security.md](references/auth-security.md) |
 | Drive KSeF from an assistant or bot (Grok, Codex, Claude, …) | [references/bot-integration.md](references/bot-integration.md) |

@@ -13,6 +13,11 @@ secrets in [auth-security.md](auth-security.md).
 
 If a prerequisite is missing, say which one — the skill does not supply it.
 
+When the user hands a KSeF token to the bot, take it only through the host's
+secret input (for example a secret form in a private chat), never from an
+ordinary or group message. Store it as `KSEF2_TOKEN` and create the profile
+with `--token-env KSEF2_TOKEN`.
+
 ## Read-only and state-changing commands
 
 Answer data questions from query commands; they change nothing server-side:
@@ -53,8 +58,10 @@ reports an incident.
 ## Multi-tenant and multi-context boundaries
 
 One profile per NIP/context; state files, receipts, and auth state belong to
-the context that created them. Never move a state file, receipt, token, or
-download URL between tenants. When a request spans two contexts, authenticate
+the context that created them. Acting for another company's NIP — an
+accounting office serving clients — needs permissions that company granted in
+KSeF; authenticating alone does not provide them. Never move a state file,
+receipt, token, or download URL between tenants. When a request spans two contexts, authenticate
 twice with two profiles and keep their files separate.
 
 ## Host authorization and untrusted invoice content

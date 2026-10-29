@@ -59,11 +59,9 @@ with Client(Environment.TEST) as client:      # construction is local; no reques
 | --- | --- | --- |
 | `Environment.TEST` | `https://api-test.ksef.mf.gov.pl/v2` | Development, TEST-only helpers, real work only with test data. |
 | `Environment.DEMO` | `https://api-demo.ksef.mf.gov.pl/v2` | Production-like behavior, non-production credentials. |
-| `Environment.PRODUCTION` | `https://api.ksef.mf.gov.pl/v2` | Real taxpayer workflows — explicit user request only. |
+| `Environment.PRODUCTION` | `https://api.ksef.mf.gov.pl/v2` | Real taxpayer workflows. |
 
-`AsyncClient` mirrors `Client` with `await`. Environment choice is an
-operational boundary: credentials, profiles, persisted session data, invoice
-numbers, and download URLs are scoped to it. `with_profile()` rejects a
+`AsyncClient` mirrors `Client` with `await`. `with_profile()` rejects a
 profile whose environment does not match the client's, and TEST-only helpers
 enforce themselves — `with_test_certificate()` outside `Environment.TEST`
 raises `KSeFUnsupportedEnvironmentError` before any request *(verified)*.

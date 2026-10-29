@@ -8,54 +8,41 @@ and [`ksef2-cli`](https://github.com/stacking-hq/ksef2-cli):
 
 - CLI usage: queries, exit codes, pagination, `--wait`/receipt workflows
 - SDK/API integration: stable imports, async handles, retries, error handling
-- Authentication & security: methods, secrets, environment/tenant boundaries
-- Bot integration: read-only defaults, credential boundaries, production gating
+- Authentication & security: methods, secrets, profiles, environments
+- Bot integration: host prerequisites, tenant authorization, safe reporting
 
 The skill is **documentation, not runtime**: it ships no tools, no credentials,
-and no network access. Everything it states is pinned to upstream commits in
-[`skills/ksef2/provenance.md`](skills/ksef2/provenance.md), with recorded
-offline checks and their limitations.
+and no network access. Its content is pinned to upstream commits in
+[`skills/ksef2/provenance.md`](skills/ksef2/provenance.md).
 
 ## Layout
 
 ```text
 skills/ksef2/
-├── SKILL.md                 Entrypoint: safety defaults + routing
+├── SKILL.md                 Entrypoint: operating rules + routing
 ├── references/
 │   ├── cli.md               ksef2-cli commands, output, pagination, async
 │   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
-│   ├── auth-security.md     credentials, secrets, environment boundaries
-│   └── bot-integration.md   assistant/bot operating rules
+│   ├── auth-security.md     credentials, secrets, profiles, environments
+│   └── bot-integration.md   assistant/bot integration
 ├── evals/prompts.md         10 eval prompts with pass/fail criteria
-└── provenance.md            pinned source SHAs, recorded checks, limitations
+└── provenance.md            pinned source SHAs, offline checks, limitations
 ```
 
-Frontmatter uses only the portable `name` + `description` fields required by
-the open skill format, so the same package works across skill loaders.
-
 ## Install
-
-**With the open skills CLI (skills.sh-compatible):**
 
 ```bash
 npx skills add stacking-hq/ksef2-skills --skill ksef2
 ```
 
-`--skill ksef2` selects the skill by its frontmatter `name` (the CLI's
-`-s, --skill` option). The skills CLI discovers `skills/<name>/SKILL.md` in a
-repository and installs it into your agent's
-skills directory (`.claude/skills/`, `.codex/skills/`, `.grok/skills/`,
-`.agents/skills/`, …).
-
-**Manual:**
+The skills CLI installs into your agent's skills directory
+(`.claude/skills/`, `.codex/skills/`, `.grok/skills/`, `.agents/skills/`, …).
+Or copy it manually:
 
 ```bash
 git clone https://github.com/stacking-hq/ksef2-skills
 cp -r ksef2-skills/skills/ksef2 ~/.agents/skills/    # or your agent's skills dir
 ```
-
-Then confirm discovery using your agent's skill listing. For installs managed
-by the skills CLI, use `npx skills list` or `npx skills list --global` as appropriate.
 
 **Runtime prerequisites** (the skill does not provide these):
 
@@ -65,57 +52,28 @@ uv tool install ksef2-cli        # CLI: ksef2 / ksef2-cli
 pip install ksef2                # or: uv add ksef2
 ```
 
-Credentials are configured locally by the user — profiles or `KSEF2_*`
-environment variables — and never enter chat
-([auth-security.md](skills/ksef2/references/auth-security.md)).
+Configure credentials locally — a `ksef2` profile or `KSEF2_*` environment
+variables. The agent works in the configured profile and never needs secret
+values in chat.
 
 ## Use
 
-- The agent selects the skill from its description when a task mentions KSeF,
-  `ksef2`, `ksef2-cli`, FA(3)/FA3 invoices, UPO, invoice metadata, or exports.
-- Explicit invocation: `$ksef2`.
-- Once loaded, the skill routes to exactly one reference per task and applies
-  its safety defaults: TEST-first, read-only-first, production and submissions
-  only on explicit request, credentials referenced by name only.
-- Run `ksef2 <group> <subcommand> --help` before quoting any flag you have not
-  seen in a reference — the skill instructs the agent to do this rather than
-  trust memory.
-
-## Verify
-
-Check CLI commands with `ksef2 <group> <subcommand> --help` and compare SDK
-imports and signatures with the pinned upstream source. Recorded offline
-checks and their limitations are in [provenance.md](skills/ksef2/provenance.md).
+The agent loads the skill when a task mentions KSeF, `ksef2`, `ksef2-cli`,
+FA(3)/FA3 invoices, UPO, invoice metadata, or exports. Invoke it explicitly
+with `$ksef2`.
 
 ## Evaluate
 
 [`skills/ksef2/evals/prompts.md`](skills/ksef2/evals/prompts.md) contains 10
-realistic prompts with pass/fail criteria (read-only queries, production
-gating, timeout recovery, secret handling, flag-fabrication pressure). Give an
-agent the skill plus one prompt in a scratch workspace; do not include the
-criteria in the prompt.
+realistic prompts with pass/fail criteria. Give an agent the skill plus one
+prompt in a scratch workspace; do not include the criteria in the prompt.
 
 ## Publish
 
-1. Keep the package intact: `skills/ksef2/SKILL.md` must stay at that path
-   with its `name`/`description` frontmatter — the skills CLI discovers
-   `skills/<name>/SKILL.md` up to two category levels deep.
-2. Push this repository to a **public** GitHub repo (this checkout's remote is
-   `stacking-hq/ksef2-skills`). Review `SKILL.md` and references before the
-   first push; keep [provenance.md](skills/ksef2/provenance.md) pins current
-   whenever upstream moves.
-3. Install once from the published repo to smoke-test discovery:
-   `npx skills add stacking-hq/ksef2-skills --skill ksef2`.
-4. [skills.sh](https://skills.sh) indexes public skills shipped through the
-   open skills CLI — no separate submission step is required for listing.
-5. Optional README badge:
-
-```markdown
-[![skills.sh](https://skills.sh/b/stacking-hq/ksef2-skills)](https://skills.sh/stacking-hq/ksef2-skills)
-```
-
-The package has been reviewed and verified offline. Live authenticated KSeF
-workflows remain untested.
+[skills.sh](https://skills.sh) indexes public repositories installed through
+the skills CLI; no separate submission is needed. Keep
+`skills/ksef2/SKILL.md` at that path, and update the pins in
+[provenance.md](skills/ksef2/provenance.md) when upstream moves.
 
 ## License
 

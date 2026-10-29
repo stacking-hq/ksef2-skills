@@ -1,6 +1,6 @@
 # Authentication and security
 
-Single source for credentials, secret storage, and environment boundaries.
+Single source for credentials, secret storage, and environments.
 Verified against the pinned commits in
 [../provenance.md](../provenance.md); the exit-code and exception checks below
 were executed offline.
@@ -73,8 +73,8 @@ Keep secrets in environment variables, a secret manager, or
 application-owned secure storage. Chat, displayed commands, shell history,
 logs, and issue comments stay credential-free: reference `KSEF2_TOKEN`,
 `--token-env KSEF2_TOKEN`, `company.key`, `ksef2-auth.json` — never the value
-behind them. Never ask the user to paste a token, password, or private key
-into the conversation.
+behind them. Presigned download URLs stay out too. Never ask the user to
+paste a token, password, or private key into the conversation.
 
 ## Files the CLI writes are credentials
 
@@ -105,22 +105,14 @@ In `--json` mode, every recognized secret is replaced with `<redacted>`
 before encoding. When a later command needs the credential, save it to a file
 rather than capturing output.
 
-## Environments are separate operational boundaries
+## Environments
 
-- Environment state does not travel: tokens, session references, invoice
-  numbers, export handles, and download URLs belong to the environment that
-  produced them. A download URL always points at the host that issued it.
-- TEST is intentionally loose and its data is not private — never put real
-  invoice data there. DEMO is production-like but not for real taxpayers.
-  PRODUCTION is the only environment for real workflows.
-- Defaults protect you: a command with no `--env` and no profile runs against
-  TEST, so production requires a deliberate `--env production` or a
-  production profile in the command itself.
-
-**Production gate.** Run production commands and submit invoices only when the
-user explicitly asks for them, and show the environment in the command you
-execute. Treat any production-shaped request phrased vaguely ("send the
-invoices", "just use prod") as needing the environment confirmed first.
+- PRODUCTION is the only environment for real workflows. DEMO is
+  production-like but not for real taxpayers. TEST is intentionally loose and
+  its data is not private — never put real invoice data there.
+- A command with no `--env` and no profile runs against TEST. A query meant
+  for production then returns TEST data, or nothing, without an error — name
+  the profile or environment in every command.
 
 ## Authentication is not authorization
 

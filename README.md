@@ -1,10 +1,45 @@
-# ksef2-skills
+<h1 align="center">ksef2-skills: Agent Skills for KSeF 2.0</h1>
 
-A skills.sh-compatible [Agent Skill](skills/ksef2/SKILL.md) that teaches
-assistants (Grok, Codex, Claude/Anthropic, and any agent that loads standard
-`SKILL.md` packages) how to work with **KSeF 2.0** — Poland's National e-Invoicing
-System — through the [`ksef2`](https://github.com/stacking-hq/ksef2) Python SDK
-and [`ksef2-cli`](https://github.com/stacking-hq/ksef2-cli):
+<h3 align="center">
+  Teach your AI assistant to work with the ksef2 SDK and CLI tools that allow integrating with the KSeF 2.0 API.
+</h3>
+
+<p align="center">
+  CLI workflows, Python SDK integration, authentication, and bot integration<br>
+  through the ksef2 SDK and ksef2-cli.
+</p>
+
+<div align="center">
+  <br>
+  <a href="skills/ksef2/SKILL.md" title="ksef2 Agent Skill">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/logo/ksef2-skill-light-logo.png">
+      <img src="assets/logo/ksef2-skill-dark-logo.png" alt="ksef2-skill" width="420">
+    </picture>
+  </a>
+  <br>
+  <br>
+  <p>
+    <a href="https://skills.sh/stacking-hq/ksef2-skills/ksef2"><img src="https://img.shields.io/badge/Agent%20Skill-skills.sh-blue" alt="Available on skills.sh"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT license"></a>
+  </p>
+  <p>
+    <a href="#install">Install</a> ·
+    <a href="#use">Use</a> ·
+    <a href="https://github.com/stacking-hq/ksef2">Python SDK</a> ·
+    <a href="https://github.com/stacking-hq/ksef2-cli">CLI</a>
+  </p>
+</div>
+
+## What is ksef2-skills?
+
+`ksef2-skills` provides a skills.sh-compatible [Agent Skill](skills/ksef2/SKILL.md)
+for Poland's National e-Invoicing System, KSeF 2.0. It teaches Grok, Codex,
+Claude, and other assistants that load standard `SKILL.md` packages to use the
+[`ksef2`](https://github.com/stacking-hq/ksef2) Python SDK and
+[`ksef2-cli`](https://github.com/stacking-hq/ksef2-cli).
+
+The skill covers:
 
 - CLI usage: queries, exit codes, pagination, `--wait`/receipt workflows
 - SDK/API integration: stable imports, async handles, retries, error handling
@@ -14,20 +49,6 @@ and [`ksef2-cli`](https://github.com/stacking-hq/ksef2-cli):
 The skill is **documentation, not runtime**: it ships no tools, no credentials,
 and no network access. Its content is pinned to upstream commits in
 [`skills/ksef2/provenance.md`](skills/ksef2/provenance.md).
-
-## Layout
-
-```text
-skills/ksef2/                The installed skill
-├── SKILL.md                 Entrypoint: operating rules + routing
-├── references/
-│   ├── cli.md               ksef2-cli commands, output, FA(3) drafts, async
-│   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
-│   ├── auth-security.md     credentials, secrets, profiles, environments
-│   └── bot-integration.md   assistant/bot integration
-└── provenance.md            pinned source SHAs, offline checks, limitations
-evals/prompts.md             For maintainers: 11 eval prompts, not installed
-```
 
 ## Install
 
@@ -61,6 +82,20 @@ values in chat.
 The agent loads the skill when a task mentions KSeF, `ksef2`, `ksef2-cli`,
 FA(3)/FA3 invoices, UPO, invoice metadata, or exports. Invoke it explicitly
 with `$ksef2`.
+
+## Layout
+
+```text
+skills/ksef2/                The installed skill
+├── SKILL.md                 Entrypoint: operating rules + routing
+├── references/
+│   ├── cli.md               ksef2-cli commands, output, FA(3) drafts, async
+│   ├── sdk-api.md           ksef2 SDK imports, clients, handles, retries, errors
+│   ├── auth-security.md     credentials, secrets, profiles, environments
+│   └── bot-integration.md   assistant/bot integration
+└── provenance.md            pinned source SHAs, offline checks, limitations
+evals/prompts.md             For maintainers: 11 eval prompts, not installed
+```
 
 ## Evaluate
 

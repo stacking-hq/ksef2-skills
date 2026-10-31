@@ -27,11 +27,3 @@ without KSeF credentials and without any request to a KSeF host:
   `InvoiceBuilder` snippet produced valid FA(3) XML.
 - Every stable SDK import path, and the class, method, and default names in
   the SDK reference, exist in the installed packages.
-
-## Limitations
-
-- Authentication, sending, status polling, downloads, and exports were never
-  run against KSeF. Their behavior comes from the pinned docs and source.
-- A name that exists is not proof that it behaves as described.
-- Upstream moves on. When refreshing the skill, update the `sha=` lines and
-  repeat these checks.

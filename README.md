@@ -13,8 +13,8 @@
   <br>
   <a href="skills/ksef2/SKILL.md" title="ksef2 Agent Skill">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/logo/ksef2-skill-light-logo.png">
-      <img src="assets/logo/ksef2-skill-dark-logo.png" alt="ksef2-skill" width="420">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/logo/ksef2-skills-light-logo.png">
+      <img src="assets/logo/ksef2-skills-dark-logo.png" alt="ksef2-skills" width="420">
     </picture>
   </a>
   <br>

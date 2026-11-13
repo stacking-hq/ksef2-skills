@@ -1,6 +1,6 @@
 # ksef2 SDK reference
 
-Written for `ksef2 1.1.0` ([../provenance.md](../provenance.md)).
+Written for `ksef2 1.3.0` ([../provenance.md](../provenance.md)).
 
 ## Install
 

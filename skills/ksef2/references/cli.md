@@ -1,6 +1,6 @@
 # ksef2-cli reference
 
-Written for `ksef2-cli 1.0.0` / `ksef2 1.1.0`
+Written for `ksef2-cli 1.1.0` / `ksef2 1.3.0`
 ([../provenance.md](../provenance.md)). The full option table is generated
 upstream in `docs/reference/commands.md`; this file carries the shape,
 guarantees, and worked examples. For any flag not shown here, run
@@ -9,7 +9,7 @@ without credentials.
 
 ## Install
 
-KSeF2 CLI 1.0 needs Python 3.12+ and the `ksef2` SDK `>=1.1,<2`:
+`ksef2-cli` 1.1 needs Python 3.12+ and the `ksef2` SDK `>=1.1,<2`:
 
 ```bash
 uv tool install ksef2-cli
@@ -25,8 +25,8 @@ ksef2 --version
 ```
 
 ```text
-ksef2-cli 1.0.0
-ksef2 1.1.0
+ksef2-cli 1.1.0
+ksef2 1.3.0
 ```
 
 ## Command shape

@@ -94,10 +94,28 @@ skills/ksef2/                The installed skill
 │   ├── auth-security.md     credentials, secrets, profiles, environments
 │   └── bot-integration.md   assistant/bot integration
 └── provenance.md            pinned source SHAs, offline checks, limitations
+scripts/check_skill_sync.py  Verifies the skill against the installed packages
 evals/prompts.md             For maintainers: 11 eval prompts, not installed
 ```
 
 ## Evaluate
+
+Two checks, both offline and credential-free.
+
+`scripts/check_skill_sync.py` verifies the skill against the installed
+packages: it parses every command line in the markdown, checks the documented
+version strings, command groups, options, defaults, and exit codes, imports
+every documented SDK path, and runs each example marked `python exec` or
+`bash exec`. Point it at the build you target:
+
+```bash
+python scripts/check_skill_sync.py
+# or against a specific environment
+KSEF2_BIN=~/.local/bin/ksef2 python scripts/check_skill_sync.py
+```
+
+It needs `ksef2-cli` (which pulls in `ksef2`) importable by the same
+interpreter. It never contacts KSeF.
 
 [`evals/prompts.md`](evals/prompts.md) contains 11 realistic prompts with
 pass/fail criteria for checking the skill after a change. Give an agent the

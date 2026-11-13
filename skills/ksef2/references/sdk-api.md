@@ -28,7 +28,7 @@ These are the paths intended to survive the 1.x line:
 | `ksef2.logging` | `configure_logging()` (opt-in; the SDK is silent by default). |
 | `ksef2.certificate_stores` | Signing-certificate store protocols and adapters. |
 | `ksef2.testdata` | TEST-only `generate_nip`, `generate_pesel`. |
-| `ksef2.renderers` | `InvoiceXSLTRenderer`, `InvoicePDFExporter` (PDF needs `[pdf]`). |
+| `ksef2.renderers` | `InvoiceXSLTRenderer`, `InvoicePDFExporter` (PDF needs `[pdf]`). Both take optional `footer_text` and `watermark_text` (ksef2 1.3); the XSLT renderer also takes `validate=True` to check XML against the FA(3) schema. |
 | `ksef2.raw`, `ksef2.raw.mappers` | Low-level endpoint clients and schema-native `spec` / `supp` models. |
 
 Rules from the contract: a module path without an underscore is public,
@@ -87,7 +87,7 @@ a `hint` before any request.
 
 Local FA(3) building plus client construction — runs with no credentials:
 
-```python
+```python exec
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
@@ -117,6 +117,13 @@ invoice_xml = (
 
 client = Client(Environment.TEST)               # no network at construction
 ```
+
+`KsefInvoiceDraft` rejects unknown nested fields, so a misspelled draft key
+raises `KSeFValidationError` (which is also a `ValueError`) instead of being
+ignored (ksef2 1.2+). An omitted optional field is still accepted, and a row
+with no `quantity` yields a schema-valid invoice totalling 0.00 — read the
+built XML before sending it. `InvoiceXSLTRenderer(validate=True)` checks it
+against the FA(3) schema.
 
 ## Sending invoices (needs credentials)
 

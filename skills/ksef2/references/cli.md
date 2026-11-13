@@ -46,9 +46,11 @@ options and exit `2`.
 | `--profile NAME` | `KSEF2_PROFILE` (selects at runtime) | Named local profile for this invocation. |
 | `--nip` | `KSEF2_NIP` | Taxpayer/context NIP. |
 | `--token` / `--ksef-token` | `KSEF2_TOKEN` | KSeF token auth. |
+| `--context-type` `[nip\|internal_id\|nip_vat_ue\|peppol_id]` | `KSEF2_CONTEXT_TYPE` | Token-auth context type. |
 | `--test-cert` | `KSEF2_TEST_CERT` | SDK-generated TEST certificate — TEST only. |
 | `--cert` / `--key` / `--p12` (+ password options) | `KSEF2_CERT` … | PEM or PKCS#12 XAdES credentials. |
 | `--auth-state FILE` | `KSEF2_AUTH_STATE` | Reuse state from `auth login --save-state`. |
+| `--auth-timeout` / `--auth-poll-interval` | – | Bound and pace the authentication exchange (defaults `60.0` / `1.0` s; a profile's `max_poll_attempts` can set the timeout instead). |
 | `--config FILE` | `KSEF2_CONFIG` | Local config file (default `~/.config/ksef2/config.toml`). |
 | `--no-config` | – | Ignore local profiles; combining it with `--profile` exits `2`. |
 | `--verbose`, `-v` | – | Tracebacks on CLI errors. |
@@ -236,14 +238,18 @@ text — treat them as credentials ([auth-security.md](auth-security.md)).
 
 `fa3` runs locally, with no KSeF access and no credentials. You write a JSON
 draft; `fa3 build` computes the amounts and the VAT summary, then checks the
-XML against the FA(3) schema:
+XML against the FA(3) schema (on by default; `--no-validate` turns that check
+off, and `--no-pretty` writes unindented XML):
 
-```bash
+```bash exec
 ksef2 fa3 draft-example --out draft.json      # template to edit
 ksef2 --json fa3 build --in draft.json --out invoice.xml
-ksef2 --json fa3 inspect invoice.xml          # what the XML actually says
+ksef2 fa3 inspect invoice.xml          # what the XML actually says
 ksef2 fa3 render --in invoice.xml --out invoice.html
 ```
+
+`--json` is global, so put it before the group — `ksef2 --json fa3 inspect
+invoice.xml` — to get machine-readable output from `inspect` and `render`.
 
 The template holds sample data. Before sending, replace:
 
@@ -255,24 +261,31 @@ The template holds sample data. Before sending, replace:
 
 A row carries `name`, `quantity`, `unit_of_measure`, `unit_price_net`, and
 `vat_rate`. Write numbers as strings (`"10"`, `"100.00"`); `vat_rate` must be
-a string from `23 22 8 7 5 4 3 0 zw np oo` — a JSON number crashes the build.
-Write no totals.
+a string from `23 22 8 7 5 4 3 0 zw np oo` — a JSON number is rejected with
+exit `2` and `Invalid VAT rate`. Write no totals.
 
 A correction sets `body.invoice_type` to the full label
 `"Faktura korygująca"` (the short code `KOR` is rejected) and lists the
 corrected invoice under `body.correction.corrected_invoices`
-(`issue_date`, `invoice_number`, `ksef_id`). Rows with
-`"before_correction": true` give the state before the correction.
+(`issue_date`, `invoice_number`, `ksef_id`). `ksef_id` must be a complete KSeF
+number, not an arbitrary digit string — the schema rejects anything that does
+not match its pattern. Rows with `"before_correction": true` give the state
+before the correction.
 
-**Check `fa3 inspect` before sending.** Unknown keys inside `seller`, `buyer`,
-`body`, and rows are dropped without an error: a row with `"qty"` instead of
-`"quantity"` builds a schema-valid invoice for 0.00 and exits `0`. Compare
+**Check `fa3 inspect` before sending.** A misspelled key is a hard error: since
+ksef2 1.2.0 the draft models forbid unknown fields, so a row with `"qty"`
+instead of `"quantity"` fails the build with
+`body.rows.0.qty: Extra inputs are not permitted` and exit `1`. What still
+passes silently is an **omitted** field — drop `quantity` altogether and the
+build exits `0` with a schema-valid invoice whose total is 0.00. Compare
 parties, rows, and totals in the inspect output with the request.
 
-For fields beyond the template (advances, payment, foreign currency), read
-the draft's JSON Schema from the SDK and look up only the definitions you
-need:
+For fields beyond the template (advances, payment, foreign currency), read the
+draft's JSON Schema and look up only the definitions you need:
 
-```bash
-python3 -c 'import json; from ksef2.fa3 import KsefInvoiceDraft; print(json.dumps(KsefInvoiceDraft.model_json_schema()))' > draft-schema.json
+```bash exec
+ksef2 fa3 schema --out draft-schema.json
 ```
+
+`fa3 schema` prints the same schema the SDK exposes as
+`KsefInvoiceDraft.model_json_schema()`.

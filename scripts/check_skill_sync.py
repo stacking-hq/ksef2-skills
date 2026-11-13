@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Check this repository against the installed ksef2 SDK and ksef2-cli.
 
-Offline by design: it never contacts KSeF, needs no credentials, and runs no
-state-changing command. CLI examples are validated by appending ``--help``,
-which makes the parser check the command path, every option, option placement,
-and choice values, then exit before authenticating or sending a request.
+The current marked examples are local operations. This script is not a network
+sandbox: review new executable examples before running them. CLI examples are
+probed with ``--help``, which checks command paths and option names but bypasses
+required arguments and value validation. It does not execute those workflows.
 
 Run it with the interpreter that has the packages under test:
 
@@ -322,7 +322,7 @@ def run(
         timeout=120,
         env=env
         or {
-            **os.environ,
+            **{k: v for k, v in os.environ.items() if not k.startswith("KSEF2_")},
             "KSEF2_CONFIG": "/nonexistent-for-check.toml",
             "NO_COLOR": "1",
             "TERM": "dumb",
@@ -441,9 +441,9 @@ def make_sandbox(tmp: Path, ksef2_bin: str) -> dict[str, str]:
     line parses.
     """
     env_path = os.environ.get("PATH", "/usr/bin")
-    # Remove the real user config from the picture before anything else runs.
-    os.environ.pop("KSEF2_CONFIG", None)
     config = tmp / "check-config.toml"
+    home = tmp / "home"
+    home.mkdir(exist_ok=True)
     # Put the checked executable on PATH so a marked example can call `ksef2`
     # exactly as the reference shows it.
     bin_dir = tmp / "bin"
@@ -452,8 +452,10 @@ def make_sandbox(tmp: Path, ksef2_bin: str) -> dict[str, str]:
     if not link.exists():
         link.symlink_to(Path(ksef2_bin).resolve())
     env = {
-        **os.environ,
+        **{k: v for k, v in os.environ.items() if not k.startswith("KSEF2_")},
         "KSEF2_CONFIG": str(config),
+        "HOME": str(home),
+        "XDG_CONFIG_HOME": str(home / ".config"),
         "NO_COLOR": "1",
         "TERM": "dumb",
         "COLUMNS": "200",
@@ -492,7 +494,9 @@ def make_sandbox(tmp: Path, ksef2_bin: str) -> dict[str, str]:
 # checks
 
 
-def check_versions(report: Report, ksef2_bin: str, python: str) -> None:
+def check_versions(
+    report: Report, ksef2_bin: str, python: str, repo: Path = REPO
+) -> None:
     proc = run([ksef2_bin, "--version"])
     if report.check(
         proc.returncode == 0, "--version runs", f"--version exited {proc.returncode}"
@@ -514,11 +518,11 @@ def check_versions(report: Report, ksef2_bin: str, python: str) -> None:
     # Historical notes elsewhere in the prose ("ksef2 1.2.0 added ...") are not
     # claims about the current release and are deliberately not matched here.
     checked = 0
-    for path in sorted(REPO.rglob("*.md")):
+    for path in sorted(repo.rglob("*.md")):
         if ".git" in path.parts:
             continue
         text = path.read_text(encoding="utf-8")
-        relative = path.relative_to(REPO)
+        relative = path.relative_to(repo)
         for match in re.finditer(
             r"Written for `ksef2-cli ([\d.]+)`(?:\s*/\s*`ksef2 ([\d.]+))?"
             r"|Written for `ksef2 ([\d.]+)`",
@@ -565,10 +569,9 @@ def check_cli_commands(
 ) -> None:
     """Validate each documented command line by parsing it.
 
-    ``--help`` makes the parser resolve the command path, every option, option
-    placement, and choice values, then exit before authenticating or sending a
-    request. A documented line that no longer parses is drift in either the
-    reference or the installed CLI.
+    ``--help`` checks command paths and option names, but skips required
+    arguments and value validation. Passing this probe does not prove that
+    the documented workflow executes successfully.
     """
     commands = extract_cli_commands(repo)
     if not report.check(
@@ -775,7 +778,10 @@ def option_default(help_text: str, option: str) -> str | None:
 def check_wait_defaults(report: Report, tree: dict[str, str]) -> None:
     for command, expected in {
         **DOCUMENTED_WAIT_DEFAULTS,
-        **DOCUMENTED_OPTION_DEFAULTS,
+        **{
+            command: {**DOCUMENTED_WAIT_DEFAULTS.get(command, {}), **defaults}
+            for command, defaults in DOCUMENTED_OPTION_DEFAULTS.items()
+        },
     }.items():
         text = tree.get(command, "")
         if not report.check(
@@ -917,7 +923,11 @@ def check_runnable_examples(
         script = textwrap.dedent("\n".join(body))
         location = f"{path.relative_to(repo)}:{offset}"
         lang = info.split()[0]
-        command = [python, "-c", script] if lang == "python" else ["bash", "-c", script]
+        command = (
+            [python, "-c", script]
+            if lang == "python"
+            else ["bash", "--noprofile", "--norc", "-e", "-o", "pipefail", "-c", script]
+        )
         proc = run(command, cwd=workdir, env=env)
         ran += 1
         report.check(
@@ -984,7 +994,7 @@ def run_all(
         check_wait_defaults(report, tree)
 
     sections = [
-        ("versions", lambda: check_versions(report, ksef2_bin, python)),
+        ("versions", lambda: check_versions(report, ksef2_bin, python, repo)),
         (
             "cli examples",
             lambda: check_cli_commands(report, ksef2_bin, repo, env, workdir),

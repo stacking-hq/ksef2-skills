@@ -100,22 +100,24 @@ evals/prompts.md             For maintainers: 11 eval prompts, not installed
 
 ## Evaluate
 
-Two checks, both offline and credential-free.
+The checks below are intended for offline use. The script is not a network
+sandbox; review executable examples before running it.
 
 `scripts/check_skill_sync.py` verifies the skill against the installed
-packages: it parses every command line in the markdown, checks the documented
+packages: it probes fenced CLI examples with `--help`, checks selected
 version strings, command groups, options, defaults, and exit codes, imports
-every documented SDK path, and runs each example marked `python exec` or
-`bash exec`. Point it at the build you target:
+a maintained list of SDK symbols, and runs examples marked `python exec` or
+`bash exec`. Help probes do not validate required arguments or option values.
+Unmarked SDK workflows are not executed. Point it at the build you target:
 
 ```bash
 python scripts/check_skill_sync.py
 # or against a specific environment
-KSEF2_BIN=~/.local/bin/ksef2 python scripts/check_skill_sync.py
+KSEF2_BIN=/path/to/venv/bin/ksef2 KSEF2_PYTHON=/path/to/venv/bin/python python scripts/check_skill_sync.py
 ```
 
-It needs `ksef2-cli` (which pulls in `ksef2`) importable by the same
-interpreter. It never contacts KSeF.
+Set both overrides when the checked packages use a different interpreter.
+The current marked examples perform local FA(3) operations.
 
 [`evals/prompts.md`](evals/prompts.md) contains 11 realistic prompts with
 pass/fail criteria for checking the skill after a change. Give an agent the

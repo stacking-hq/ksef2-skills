@@ -49,7 +49,7 @@ def test_skill_matches_installed_packages(tmp_path: Path) -> None:
     """Every documented command, flag, default, and API still holds."""
     module = _load()
     binary = _binary()
-    python = sys.executable
+    python = os.environ.get("KSEF2_PYTHON") or sys.executable
 
     workdir = tmp_path
     env = module.make_sandbox(workdir, binary)
@@ -120,3 +120,34 @@ def test_examples_are_marked_for_execution() -> None:
         "expected at least three runnable examples; a sync that removes them "
         "silently stops executing anything"
     )
+
+
+def test_send_wait_defaults_are_not_overwritten() -> None:
+    module = _load()
+    report = module.Report()
+    module.check_wait_defaults(report, {"invoices send": "present but no defaults"})
+    assert any("invoices send --timeout" in failure for failure in report.failures)
+    assert any(
+        "invoices send --poll-interval" in failure for failure in report.failures
+    )
+
+
+def test_bash_example_fails_on_first_error(tmp_path: Path) -> None:
+    module = _load()
+    (tmp_path / "example.md").write_text("```bash exec\nfalse\ntrue\n```\n")
+    report = module.Report()
+    module.check_runnable_examples(report, sys.executable, tmp_path, {}, tmp_path)
+    assert report.failures
+
+
+@requires_cli
+def test_sandbox_does_not_inherit_ksef_credentials(tmp_path: Path, monkeypatch) -> None:
+    module = _load()
+    monkeypatch.setenv("KSEF2_AUTH_STATE", "/must-not-read.json")
+    monkeypatch.setenv("KSEF2_KEY_PASSWORD", "synthetic-test-value")
+    monkeypatch.setenv("KSEF2_CONFIG", "/must-not-read.toml")
+    env = module.make_sandbox(tmp_path, _binary())
+    assert "KSEF2_AUTH_STATE" not in env
+    assert "KSEF2_KEY_PASSWORD" not in env
+    assert env["HOME"] == str(tmp_path / "home")
+    assert os.environ["KSEF2_CONFIG"] == "/must-not-read.toml"

@@ -13,19 +13,7 @@ the commits below.
   — released 2026-10-29 (generated command reference under
   `docs/reference/commands.md`)
 
-## Automated check
-
-`scripts/check_skill_sync.py` re-verifies this skill against whatever
-`ksef2-cli` and `ksef2` are installed. Its current executable examples need
-no credentials or KSeF connection. It
-probes fenced command lines by appending `--help`, checks the
-documented version strings, group map, global options, pagination families,
-wait-flag defaults, and exit codes, imports a maintained list of SDK paths and
-symbols, asserts selected retry and environment defaults, and
-runs each fence marked `python exec` or `bash exec`. Help bypasses required
-arguments and value validation. Unmarked SDK workflows are not executed,
-and this script does not enforce a network sandbox. See
-[../../README.md](../../README.md#evaluate).
+## Offline checks
 
 Run on 2026-11-13 against `ksef2-cli 1.1.0` and `ksef2 1.3.0` from PyPI, with
 no KSeF credentials and no request to a KSeF host:
@@ -38,8 +26,6 @@ no KSeF credentials and no request to a KSeF host:
   TEST-only SDK helpers outside TEST.
 - `fa3 draft-example` → `fa3 build` → `fa3 inspect` → `fa3 render` and the SDK
   `InvoiceBuilder` snippet produced valid FA(3) XML.
-- The maintained SDK import and symbol lists resolve in the installed packages.
-  This does not verify every documented method or call signature.
 
 ## Changes since the 1.1.0 / 1.0.0 pins
 

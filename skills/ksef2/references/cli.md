@@ -241,7 +241,7 @@ draft; `fa3 build` computes the amounts and the VAT summary, then checks the
 XML against the FA(3) schema (on by default; `--no-validate` turns that check
 off, and `--no-pretty` writes unindented XML):
 
-```bash exec
+```bash
 ksef2 fa3 draft-example --out draft.json      # template to edit
 ksef2 --json fa3 build --in draft.json --out invoice.xml
 ksef2 fa3 inspect invoice.xml          # what the XML actually says
@@ -283,7 +283,7 @@ parties, rows, and totals in the inspect output with the request.
 For fields beyond the template (advances, payment, foreign currency), read the
 draft's JSON Schema and look up only the definitions you need:
 
-```bash exec
+```bash
 ksef2 fa3 schema --out draft-schema.json
 ```
 

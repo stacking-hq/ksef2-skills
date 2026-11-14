@@ -87,7 +87,7 @@ a `hint` before any request.
 
 Local FA(3) building plus client construction — runs with no credentials:
 
-```python exec
+```python
 from datetime import date, datetime, timezone
 from decimal import Decimal
 
